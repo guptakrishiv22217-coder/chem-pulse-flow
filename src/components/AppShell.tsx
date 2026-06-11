@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Activity, Calculator, LayoutDashboard, Star, Zap } from "lucide-react";
 import { allQuotes, fmt } from "@/lib/market-data";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const NAV = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
@@ -41,11 +41,20 @@ function Ticker() {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const now = new Date().toLocaleString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZoneName: "short",
-  });
+  const [now, setNow] = useState<string>("");
+  useEffect(() => {
+    const tick = () =>
+      setNow(
+        new Date().toLocaleString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          timeZoneName: "short",
+        }),
+      );
+    tick();
+    const id = setInterval(tick, 30_000);
+    return () => clearInterval(id);
+  }, []);
 
   return (
     <div className="dark min-h-screen bg-background text-foreground">
@@ -83,7 +92,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <Activity className="h-3.5 w-3.5 text-up animate-pulse" />
               LIVE
             </span>
-            <span className="tabular">{now}</span>
+            <span className="tabular" suppressHydrationWarning>
+              {now || "\u00A0"}
+            </span>
           </div>
         </div>
         {/* mobile nav */}
