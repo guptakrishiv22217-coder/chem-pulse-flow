@@ -1,3 +1,4 @@
+import { useId } from "react";
 import {
   Area,
   AreaChart,
@@ -19,11 +20,12 @@ interface Props {
 
 export function PriceChart({ data, height = 280, color, compact }: Props) {
   const stroke = color ?? "var(--color-primary)";
+  const gid = useId().replace(/:/g, "");
   return (
     <ResponsiveContainer width="100%" height={height}>
       <AreaChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
         <defs>
-          <linearGradient id="px" x1="0" y1="0" x2="0" y2="1">
+          <linearGradient id={`px-${gid}`} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor={stroke} stopOpacity={0.4} />
             <stop offset="100%" stopColor={stroke} stopOpacity={0} />
           </linearGradient>
@@ -65,7 +67,7 @@ export function PriceChart({ data, height = 280, color, compact }: Props) {
           dataKey="price"
           stroke={stroke}
           strokeWidth={1.6}
-          fill="url(#px)"
+          fill={`url(#px-${gid})`}
           isAnimationActive={false}
         />
       </AreaChart>
