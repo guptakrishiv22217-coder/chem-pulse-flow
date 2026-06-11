@@ -9,10 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WatchlistRouteImport } from './routes/watchlist'
 import { Route as CalculatorRouteImport } from './routes/calculator'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CommoditySymbolRouteImport } from './routes/commodity.$symbol'
 
+const WatchlistRoute = WatchlistRouteImport.update({
+  id: '/watchlist',
+  path: '/watchlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CalculatorRoute = CalculatorRouteImport.update({
   id: '/calculator',
   path: '/calculator',
@@ -32,35 +38,46 @@ const CommoditySymbolRoute = CommoditySymbolRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/calculator': typeof CalculatorRoute
+  '/watchlist': typeof WatchlistRoute
   '/commodity/$symbol': typeof CommoditySymbolRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/calculator': typeof CalculatorRoute
+  '/watchlist': typeof WatchlistRoute
   '/commodity/$symbol': typeof CommoditySymbolRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/calculator': typeof CalculatorRoute
+  '/watchlist': typeof WatchlistRoute
   '/commodity/$symbol': typeof CommoditySymbolRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/calculator' | '/commodity/$symbol'
+  fullPaths: '/' | '/calculator' | '/watchlist' | '/commodity/$symbol'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/calculator' | '/commodity/$symbol'
-  id: '__root__' | '/' | '/calculator' | '/commodity/$symbol'
+  to: '/' | '/calculator' | '/watchlist' | '/commodity/$symbol'
+  id: '__root__' | '/' | '/calculator' | '/watchlist' | '/commodity/$symbol'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CalculatorRoute: typeof CalculatorRoute
+  WatchlistRoute: typeof WatchlistRoute
   CommoditySymbolRoute: typeof CommoditySymbolRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/watchlist': {
+      id: '/watchlist'
+      path: '/watchlist'
+      fullPath: '/watchlist'
+      preLoaderRoute: typeof WatchlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/calculator': {
       id: '/calculator'
       path: '/calculator'
@@ -88,6 +105,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CalculatorRoute: CalculatorRoute,
+  WatchlistRoute: WatchlistRoute,
   CommoditySymbolRoute: CommoditySymbolRoute,
 }
 export const routeTree = rootRouteImport
