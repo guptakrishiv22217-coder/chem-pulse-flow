@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, AlertTriangle } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import {
   Select,
   SelectContent,
@@ -32,11 +33,12 @@ interface Ingredient {
   id: string;
   symbol: string;
   qty: number; // MT per output unit
+  costPct: number; // % adjustment to base cost (-50..+50)
 }
 
 const DEFAULT_INGREDIENTS: Ingredient[] = [
-  { id: "1", symbol: "ETH", qty: 0.55 },
-  { id: "2", symbol: "BNZ", qty: 0.42 },
+  { id: "1", symbol: "ETH", qty: 0.55, costPct: 0 },
+  { id: "2", symbol: "BNZ", qty: 0.42, costPct: 0 },
 ];
 
 function CalculatorPage() {
@@ -49,10 +51,22 @@ function CalculatorPage() {
   const [yieldPct, setYieldPct] = useState(94);
   const [ingredients, setIngredients] = useState<Ingredient[]>(DEFAULT_INGREDIENTS);
 
-  const rawCost = ingredients.reduce((sum, ing) => sum + priceOf(ing.symbol) * ing.qty, 0);
+  const adjustedPriceOf = (s: string, costPct: number) => {
+    const base = priceOf(s);
+    return base * (1 + costPct / 100);
+  };
+
+  const rawCost = ingredients.reduce(
+    (sum, ing) => sum + adjustedPriceOf(ing.symbol, ing.costPct) * ing.qty,
+    0,
+  );
   const effectiveCost = (rawCost + overhead) / (yieldPct / 100);
   const margin = sellPrice - effectiveCost;
   const marginPct = sellPrice > 0 ? (margin / sellPrice) * 100 : 0;
+
+  // AI Insights: ingredients with >20% cost spike
+  const spiked = ingredients.filter((ing) => ing.costPct > 20);
+  const minPriceFor25Margin = effectiveCost / 0.75;
 
   const addIngredient = () => {
     const used = new Set(ingredients.map((i) => i.symbol));
@@ -60,7 +74,7 @@ function CalculatorPage() {
     if (!next) return;
     setIngredients([
       ...ingredients,
-      { id: crypto.randomUUID(), symbol: next.symbol, qty: 0.1 },
+      { id: crypto.randomUUID(), symbol: next.symbol, qty: 0.1, costPct: 0 },
     ]);
   };
 
@@ -103,59 +117,77 @@ function CalculatorPage() {
           <h2 className="mb-2 font-mono text-xs uppercase tracking-widest text-muted-foreground">
             Raw Materials
           </h2>
-          <div className="space-y-2">
+          <div className="space-y-3">
             {ingredients.map((ing) => {
-              const q = quotes.find((x) => x.symbol === ing.symbol);
-              const cost = (q?.price ?? 0) * ing.qty;
+              const adjPrice = adjustedPriceOf(ing.symbol, ing.costPct);
+              const cost = adjPrice * ing.qty;
+              const cName = COMMODITIES.find((c) => c.symbol === ing.symbol)?.name ?? ing.symbol;
               return (
                 <div
                   key={ing.id}
-                  className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-2 rounded-md border border-border bg-background p-2"
+                  className="rounded-md border border-border bg-background p-2"
                 >
-                  <Select
-                    value={ing.symbol}
-                    onValueChange={(v) =>
-                      setIngredients((arr) =>
-                        arr.map((i) => (i.id === ing.id ? { ...i, symbol: v } : i)),
-                      )
-                    }
-                  >
-                    <SelectTrigger className="h-9">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {COMMODITIES.map((c) => (
-                        <SelectItem key={c.symbol} value={c.symbol}>
-                          <span className="font-mono">{c.symbol}</span> — {c.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={ing.qty}
-                    onChange={(e) =>
-                      setIngredients((arr) =>
-                        arr.map((i) =>
-                          i.id === ing.id ? { ...i, qty: Number(e.target.value) || 0 } : i,
-                        ),
-                      )
-                    }
-                    className="w-24 font-mono tabular"
-                  />
-                  <div className="w-28 text-right font-mono text-sm tabular">
-                    ${fmt(cost)}
+                  <div className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-2">
+                    <Select
+                      value={ing.symbol}
+                      onValueChange={(v) =>
+                        setIngredients((arr) =>
+                          arr.map((i) => (i.id === ing.id ? { ...i, symbol: v } : i)),
+                        )
+                      }
+                    >
+                      <SelectTrigger className="h-9">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {COMMODITIES.map((c) => (
+                          <SelectItem key={c.symbol} value={c.symbol}>
+                            <span className="font-mono">{c.symbol}</span> — {c.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={ing.qty}
+                      onChange={(e) =>
+                        setIngredients((arr) =>
+                          arr.map((i) =>
+                            i.id === ing.id ? { ...i, qty: Number(e.target.value) || 0 } : i,
+                          ),
+                        )
+                      }
+                      className="w-24 font-mono tabular"
+                    />
+                    <div className="w-32 text-right font-mono text-sm tabular">
+                      ${fmt(cost)}
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() =>
+                        setIngredients((arr) => arr.filter((i) => i.id !== ing.id))
+                      }
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() =>
-                      setIngredients((arr) => arr.filter((i) => i.id !== ing.id))
-                    }
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <div className="mt-2">
+                    <SliderRow
+                      label={`${cName} Cost Adjust`}
+                      value={ing.costPct}
+                      onChange={(n) =>
+                        setIngredients((arr) =>
+                          arr.map((i) => (i.id === ing.id ? { ...i, costPct: n } : i)),
+                        )
+                      }
+                      min={-50}
+                      max={50}
+                      step={1}
+                      display={`${ing.costPct >= 0 ? "+" : ""}${ing.costPct}%`}
+                    />
+                  </div>
                 </div>
               );
             })}
@@ -233,6 +265,36 @@ function CalculatorPage() {
           </div>
         </section>
       </div>
+
+      {/* AI Business Action Insights */}
+      <section className="mt-8">
+        <h2 className="mb-4 font-mono text-xs uppercase tracking-widest text-muted-foreground">
+          AI Business Action Insights
+        </h2>
+        {spiked.length === 0 ? (
+          <div className="rounded-md border border-border bg-card p-4 text-sm text-muted-foreground">
+            Cost levels are stable. No immediate action required.
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {spiked.map((ing) => {
+              const cName = COMMODITIES.find((c) => c.symbol === ing.symbol)?.name ?? ing.symbol;
+              return (
+                <Alert key={ing.id} variant="destructive" className="border-destructive/30">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertTitle>Alert: {cName} Cost Spike</AlertTitle>
+                  <AlertDescription>
+                    {cName} spikes are heavily impacting this recipe. Recommendation: Review
+                    alternative suppliers, negotiate quarterly forward contracts, or increase
+                    finished product price to at least <strong>${fmt(minPriceFor25Margin)}</strong>{" "}
+                    to preserve your 25% margin target.
+                  </AlertDescription>
+                </Alert>
+              );
+            })}
+          </div>
+        )}
+      </section>
     </AppShell>
   );
 }
