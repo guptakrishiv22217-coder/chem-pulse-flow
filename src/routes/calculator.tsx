@@ -62,7 +62,7 @@ function CalculatorPage() {
     if (!next) return;
     setIngredients([
       ...ingredients,
-      { id: crypto.randomUUID(), symbol: next.symbol, qty: 0.1 },
+      { id: crypto.randomUUID(), symbol: next.symbol, qty: 0.1, costPct: 0 },
     ]);
   };
 
