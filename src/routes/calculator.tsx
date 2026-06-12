@@ -117,59 +117,78 @@ function CalculatorPage() {
           <h2 className="mb-2 font-mono text-xs uppercase tracking-widest text-muted-foreground">
             Raw Materials
           </h2>
-          <div className="space-y-2">
+          <div className="space-y-3">
             {ingredients.map((ing) => {
               const q = quotes.find((x) => x.symbol === ing.symbol);
-              const cost = (q?.price ?? 0) * ing.qty;
+              const adjPrice = adjustedPriceOf(ing.symbol, ing.costPct);
+              const cost = adjPrice * ing.qty;
+              const cName = COMMODITIES.find((c) => c.symbol === ing.symbol)?.name ?? ing.symbol;
               return (
                 <div
                   key={ing.id}
-                  className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-2 rounded-md border border-border bg-background p-2"
+                  className="rounded-md border border-border bg-background p-2"
                 >
-                  <Select
-                    value={ing.symbol}
-                    onValueChange={(v) =>
-                      setIngredients((arr) =>
-                        arr.map((i) => (i.id === ing.id ? { ...i, symbol: v } : i)),
-                      )
-                    }
-                  >
-                    <SelectTrigger className="h-9">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {COMMODITIES.map((c) => (
-                        <SelectItem key={c.symbol} value={c.symbol}>
-                          <span className="font-mono">{c.symbol}</span> — {c.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={ing.qty}
-                    onChange={(e) =>
-                      setIngredients((arr) =>
-                        arr.map((i) =>
-                          i.id === ing.id ? { ...i, qty: Number(e.target.value) || 0 } : i,
-                        ),
-                      )
-                    }
-                    className="w-24 font-mono tabular"
-                  />
-                  <div className="w-28 text-right font-mono text-sm tabular">
-                    ${fmt(cost)}
+                  <div className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-2">
+                    <Select
+                      value={ing.symbol}
+                      onValueChange={(v) =>
+                        setIngredients((arr) =>
+                          arr.map((i) => (i.id === ing.id ? { ...i, symbol: v } : i)),
+                        )
+                      }
+                    >
+                      <SelectTrigger className="h-9">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {COMMODITIES.map((c) => (
+                          <SelectItem key={c.symbol} value={c.symbol}>
+                            <span className="font-mono">{c.symbol}</span> — {c.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={ing.qty}
+                      onChange={(e) =>
+                        setIngredients((arr) =>
+                          arr.map((i) =>
+                            i.id === ing.id ? { ...i, qty: Number(e.target.value) || 0 } : i,
+                          ),
+                        )
+                      }
+                      className="w-24 font-mono tabular"
+                    />
+                    <div className="w-32 text-right font-mono text-sm tabular">
+                      ${fmt(cost)}
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() =>
+                        setIngredients((arr) => arr.filter((i) => i.id !== ing.id))
+                      }
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() =>
-                      setIngredients((arr) => arr.filter((i) => i.id !== ing.id))
-                    }
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <div className="mt-2">
+                    <SliderRow
+                      label={`${cName} Cost Adjust`}
+                      value={ing.costPct}
+                      onChange={(n) =>
+                        setIngredients((arr) =>
+                          arr.map((i) => (i.id === ing.id ? { ...i, costPct: n } : i)),
+                        )
+                      }
+                      min={-50}
+                      max={50}
+                      step={1}
+                      display={`${ing.costPct >= 0 ? "+" : ""}${ing.costPct}%`}
+                    />
+                  </div>
                 </div>
               );
             })}
