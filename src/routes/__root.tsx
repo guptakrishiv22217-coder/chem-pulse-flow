@@ -77,14 +77,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "ChemPulse — Chemical Commodity Intelligence" },
+      {
+        name: "description",
+        content:
+          "Real-time chemical commodity prices, volatility alerts, margin analysis and watchlists.",
+      },
+      { name: "author", content: "ChemPulse" },
+      { property: "og:title", content: "ChemPulse — Chemical Commodity Intelligence" },
+      {
+        property: "og:description",
+        content: "A modern terminal for the global chemicals market.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "ChemPulse — Chemical Commodity Intelligence" },
     ],
     links: [
       {
