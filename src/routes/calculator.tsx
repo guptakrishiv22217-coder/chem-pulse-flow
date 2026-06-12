@@ -51,10 +51,22 @@ function CalculatorPage() {
   const [yieldPct, setYieldPct] = useState(94);
   const [ingredients, setIngredients] = useState<Ingredient[]>(DEFAULT_INGREDIENTS);
 
-  const rawCost = ingredients.reduce((sum, ing) => sum + priceOf(ing.symbol) * ing.qty, 0);
+  const adjustedPriceOf = (s: string, costPct: number) => {
+    const base = priceOf(s);
+    return base * (1 + costPct / 100);
+  };
+
+  const rawCost = ingredients.reduce(
+    (sum, ing) => sum + adjustedPriceOf(ing.symbol, ing.costPct) * ing.qty,
+    0,
+  );
   const effectiveCost = (rawCost + overhead) / (yieldPct / 100);
   const margin = sellPrice - effectiveCost;
   const marginPct = sellPrice > 0 ? (margin / sellPrice) * 100 : 0;
+
+  // AI Insights: ingredients with >20% cost spike
+  const spiked = ingredients.filter((ing) => ing.costPct > 20);
+  const minPriceFor25Margin = effectiveCost / 0.75;
 
   const addIngredient = () => {
     const used = new Set(ingredients.map((i) => i.symbol));
