@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, AlertTriangle } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import {
   Select,
   SelectContent,
@@ -32,11 +33,12 @@ interface Ingredient {
   id: string;
   symbol: string;
   qty: number; // MT per output unit
+  costPct: number; // % adjustment to base cost (-50..+50)
 }
 
 const DEFAULT_INGREDIENTS: Ingredient[] = [
-  { id: "1", symbol: "ETH", qty: 0.55 },
-  { id: "2", symbol: "BNZ", qty: 0.42 },
+  { id: "1", symbol: "ETH", qty: 0.55, costPct: 0 },
+  { id: "2", symbol: "BNZ", qty: 0.42, costPct: 0 },
 ];
 
 function CalculatorPage() {
