@@ -265,6 +265,36 @@ function CalculatorPage() {
           </div>
         </section>
       </div>
+
+      {/* AI Business Action Insights */}
+      <section className="mt-8">
+        <h2 className="mb-4 font-mono text-xs uppercase tracking-widest text-muted-foreground">
+          AI Business Action Insights
+        </h2>
+        {spiked.length === 0 ? (
+          <div className="rounded-md border border-border bg-card p-4 text-sm text-muted-foreground">
+            Cost levels are stable. No immediate action required.
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {spiked.map((ing) => {
+              const cName = COMMODITIES.find((c) => c.symbol === ing.symbol)?.name ?? ing.symbol;
+              return (
+                <Alert key={ing.id} variant="destructive" className="border-destructive/30">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertTitle>Alert: {cName} Cost Spike</AlertTitle>
+                  <AlertDescription>
+                    {cName} spikes are heavily impacting this recipe. Recommendation: Review
+                    alternative suppliers, negotiate quarterly forward contracts, or increase
+                    finished product price to at least <strong>${fmt(minPriceFor25Margin)}</strong>{" "}
+                    to preserve your 25% margin target.
+                  </AlertDescription>
+                </Alert>
+              );
+            })}
+          </div>
+        )}
+      </section>
     </AppShell>
   );
 }
