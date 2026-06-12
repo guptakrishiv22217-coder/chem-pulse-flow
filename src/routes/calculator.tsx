@@ -119,7 +119,6 @@ function CalculatorPage() {
           </h2>
           <div className="space-y-3">
             {ingredients.map((ing) => {
-              const q = quotes.find((x) => x.symbol === ing.symbol);
               const adjPrice = adjustedPriceOf(ing.symbol, ing.costPct);
               const cost = adjPrice * ing.qty;
               const cName = COMMODITIES.find((c) => c.symbol === ing.symbol)?.name ?? ing.symbol;
