@@ -14,7 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      commodities: {
+        Row: {
+          category: string
+          change_mo: number
+          change_pct: number
+          change_wk: number
+          currency: string
+          high_52: number
+          low_52: number
+          name: string
+          price: number
+          symbol: string
+          unit: string
+          updated_at: string
+          volatility_score: number
+        }
+        Insert: {
+          category: string
+          change_mo?: number
+          change_pct?: number
+          change_wk?: number
+          currency?: string
+          high_52?: number
+          low_52?: number
+          name: string
+          price: number
+          symbol: string
+          unit?: string
+          updated_at?: string
+          volatility_score?: number
+        }
+        Update: {
+          category?: string
+          change_mo?: number
+          change_pct?: number
+          change_wk?: number
+          currency?: string
+          high_52?: number
+          low_52?: number
+          name?: string
+          price?: number
+          symbol?: string
+          unit?: string
+          updated_at?: string
+          volatility_score?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
