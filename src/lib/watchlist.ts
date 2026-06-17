@@ -16,10 +16,9 @@ function read(): string[] {
 }
 
 export function useWatchlist() {
-  const [list, setList] = useState<string[]>(DEFAULT);
+  const [list, setList] = useState<string[]>(() => read());
 
   useEffect(() => {
-    setList(read());
     const onStorage = (e: StorageEvent) => {
       if (e.key === KEY) setList(read());
     };

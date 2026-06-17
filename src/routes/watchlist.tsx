@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { Star, X } from "lucide-react";
+import { Bell, Star, X } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { PriceChart } from "@/components/PriceChart";
 import { Button } from "@/components/ui/button";
 import { COMMODITIES, fmt, getQuote } from "@/lib/market-data";
 import { useWatchlist } from "@/lib/watchlist";
+import { loadAlerts, saveAlerts } from "@/lib/alerts";
 
 export const Route = createFileRoute("/watchlist")({
   head: () => ({
@@ -62,13 +63,40 @@ function WatchlistPage() {
                   <div className="truncate text-sm">{q.name}</div>
                   <div className="text-xs text-muted-foreground">{q.category}</div>
                 </Link>
-                <button
-                  onClick={() => toggle(q.symbol)}
-                  className="rounded p-1 text-muted-foreground opacity-0 transition-opacity hover:bg-accent hover:text-foreground group-hover:opacity-100"
-                  aria-label="Remove from watchlist"
-                >
-                  <X className="h-4 w-4" />
-                </button>
+                <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                  <button
+                    onClick={() => {
+                      const input = prompt(
+                        `Alert me when ${q.symbol} goes above or below what price? (current: ${fmt(q.price)})\n\nEnter "above 1300" or "below 1100"`,
+                      );
+                      if (!input) return;
+                      const [dir, val] = input.trim().split(/\s+/);
+                      const num = parseFloat(val);
+                      if (!num || (dir !== "above" && dir !== "below")) return;
+                      const alerts = loadAlerts();
+                      alerts.push({
+                        id: crypto.randomUUID(),
+                        symbol: q.symbol,
+                        symbolName: q.name,
+                        direction: dir as "above" | "below",
+                        threshold: num,
+                        createdAt: Date.now(),
+                      });
+                      saveAlerts(alerts);
+                    }}
+                    className="rounded p-1 text-muted-foreground hover:bg-accent hover:text-primary"
+                    aria-label="Set price alert"
+                  >
+                    <Bell className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => toggle(q.symbol)}
+                    className="rounded p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
+                    aria-label="Remove from watchlist"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
               </header>
               <div className="flex items-baseline justify-between">
                 <div className="font-mono text-2xl tabular">{fmt(q.price)}</div>

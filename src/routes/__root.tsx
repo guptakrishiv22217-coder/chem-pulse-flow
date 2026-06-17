@@ -77,21 +77,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "ChemPulse — Chemical Commodity Intelligence" },
-      {
-        name: "description",
-        content:
-          "Real-time chemical commodity prices, volatility alerts, margin analysis and watchlists.",
-      },
-      { name: "author", content: "ChemPulse" },
-      { property: "og:title", content: "ChemPulse — Chemical Commodity Intelligence" },
-      {
-        property: "og:description",
-        content: "A modern terminal for the global chemicals market.",
-      },
+      { title: "ChemMargin" },
+      { name: "description", content: "Chemical Flow Insights visualizes commodity market data and calculates profit margins." },
+      { name: "author", content: "Lovable" },
+      { property: "og:title", content: "ChemMargin" },
+      { property: "og:description", content: "Chemical Flow Insights visualizes commodity market data and calculates profit margins." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:title", content: "ChemPulse — Chemical Commodity Intelligence" },
+      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "ChemMargin" },
+      { name: "twitter:description", content: "Chemical Flow Insights visualizes commodity market data and calculates profit margins." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/1a03d020-f99a-4e6f-8c2c-d81bd0f30281/id-preview-e74b1a9d--d86273ec-28fa-46f7-8812-6568e01c1f47.lovable.app-1781171149598.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/1a03d020-f99a-4e6f-8c2c-d81bd0f30281/id-preview-e74b1a9d--d86273ec-28fa-46f7-8812-6568e01c1f47.lovable.app-1781171149598.png" },
     ],
     links: [
       {
