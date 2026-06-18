@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Activity, Bell, Calculator, LayoutDashboard, Star, X, Zap } from "lucide-react";
+import { Activity, Bell, Calculator, FileCheck, LayoutDashboard, Star, X, Zap } from "lucide-react";
 import { allQuotes, fmt } from "@/lib/market-data";
 import { useEffect, useMemo, useState } from "react";
 import { SimpleModeContext } from "@/lib/ui-mode";
@@ -14,6 +14,7 @@ const NAV = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/watchlist", label: "Watchlist", icon: Star, exact: true },
   { to: "/calculator", label: "Margin Calc", icon: Calculator, exact: true },
+  { to: "/quote-check", label: "Quote Check", icon: FileCheck, exact: true },
 ] as const;
 
 function Ticker() {
