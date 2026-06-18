@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WatchlistRouteImport } from './routes/watchlist'
+import { Route as QuoteCheckRouteImport } from './routes/quote-check'
 import { Route as CalculatorRouteImport } from './routes/calculator'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CommoditySymbolRouteImport } from './routes/commodity.$symbol'
@@ -17,6 +18,11 @@ import { Route as CommoditySymbolRouteImport } from './routes/commodity.$symbol'
 const WatchlistRoute = WatchlistRouteImport.update({
   id: '/watchlist',
   path: '/watchlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuoteCheckRoute = QuoteCheckRouteImport.update({
+  id: '/quote-check',
+  path: '/quote-check',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CalculatorRoute = CalculatorRouteImport.update({
@@ -38,12 +44,14 @@ const CommoditySymbolRoute = CommoditySymbolRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/calculator': typeof CalculatorRoute
+  '/quote-check': typeof QuoteCheckRoute
   '/watchlist': typeof WatchlistRoute
   '/commodity/$symbol': typeof CommoditySymbolRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/calculator': typeof CalculatorRoute
+  '/quote-check': typeof QuoteCheckRoute
   '/watchlist': typeof WatchlistRoute
   '/commodity/$symbol': typeof CommoditySymbolRoute
 }
@@ -51,20 +59,33 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/calculator': typeof CalculatorRoute
+  '/quote-check': typeof QuoteCheckRoute
   '/watchlist': typeof WatchlistRoute
   '/commodity/$symbol': typeof CommoditySymbolRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/calculator' | '/watchlist' | '/commodity/$symbol'
+  fullPaths:
+    | '/'
+    | '/calculator'
+    | '/quote-check'
+    | '/watchlist'
+    | '/commodity/$symbol'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/calculator' | '/watchlist' | '/commodity/$symbol'
-  id: '__root__' | '/' | '/calculator' | '/watchlist' | '/commodity/$symbol'
+  to: '/' | '/calculator' | '/quote-check' | '/watchlist' | '/commodity/$symbol'
+  id:
+    | '__root__'
+    | '/'
+    | '/calculator'
+    | '/quote-check'
+    | '/watchlist'
+    | '/commodity/$symbol'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CalculatorRoute: typeof CalculatorRoute
+  QuoteCheckRoute: typeof QuoteCheckRoute
   WatchlistRoute: typeof WatchlistRoute
   CommoditySymbolRoute: typeof CommoditySymbolRoute
 }
@@ -76,6 +97,13 @@ declare module '@tanstack/react-router' {
       path: '/watchlist'
       fullPath: '/watchlist'
       preLoaderRoute: typeof WatchlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quote-check': {
+      id: '/quote-check'
+      path: '/quote-check'
+      fullPath: '/quote-check'
+      preLoaderRoute: typeof QuoteCheckRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/calculator': {
@@ -105,6 +133,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CalculatorRoute: CalculatorRoute,
+  QuoteCheckRoute: QuoteCheckRoute,
   WatchlistRoute: WatchlistRoute,
   CommoditySymbolRoute: CommoditySymbolRoute,
 }
